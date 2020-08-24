@@ -350,6 +350,18 @@ class TransactionManager(Service, TransactionManagerT):
         return self.producer.supports_headers()
 
 
+def remove_duplicates(sorted_list: List):
+    prev = sorted_list[0]
+    idx = 1
+    while idx < len(sorted_list):
+        current = sorted_list[idx]
+        if prev == current:
+            sorted_list.pop(idx)
+            continue
+        prev = current
+        idx += 1
+
+
 class Consumer(Service, ConsumerT):
     """Base Consumer."""
 
@@ -983,6 +995,7 @@ class Consumer(Service, ConsumerT):
                 acked.extend(gaps)
                 gap_for_tp[:gap_index] = []
             acked.sort()
+            remove_duplicates(acked)
             # Note: acked is always kept sorted.
             # find first list of consecutive numbers
             batch = next(consecutive_numbers(acked))
