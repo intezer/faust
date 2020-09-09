@@ -9,6 +9,7 @@ from .assignor import PartitionAssignorT
 from .events import EventT
 from .streams import StreamT
 from .tables import CollectionT
+from .topics import TopicT
 from .transports import ConsumerT, ProducerT
 from .tuples import Message, PendingMessage, RecordMetadata, TP
 
@@ -37,7 +38,7 @@ class SensorInterfaceT(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def on_topic_buffer_full(self, tp: TP) -> None:
+    def on_topic_buffer_full(self, topic: TopicT) -> None:
         ...
 
     @abc.abstractmethod
