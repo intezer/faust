@@ -350,16 +350,15 @@ class TransactionManager(Service, TransactionManagerT):
         return self.producer.supports_headers()
 
 
-def remove_duplicates(sorted_list: List):
-    prev = sorted_list[0]
-    idx = 1
-    while idx < len(sorted_list):
-        current = sorted_list[idx]
-        if prev == current:
-            sorted_list.pop(idx)
-            continue
-        prev = current
-        idx += 1
+def consecutive_or_equal_numbers(sorted_list: List[int]) -> List[int]:
+    """Find the first batch consisting of consecutive or equal numbers. """
+    iterator = iter(sorted_list)
+    res = [next(iterator)]
+    for val in iterator:
+        if 0 != (val - res[-1]) != 1:
+            break
+        res.append(val)
+    return res
 
 
 class Consumer(Service, ConsumerT):
@@ -995,10 +994,9 @@ class Consumer(Service, ConsumerT):
                 acked.extend(gaps)
                 gap_for_tp[:gap_index] = []
             acked.sort()
-            remove_duplicates(acked)
             # Note: acked is always kept sorted.
-            # find first list of consecutive numbers
-            batch = next(consecutive_numbers(acked))
+            # find first list of consecutive or equal numbers
+            batch = consecutive_or_equal_numbers(acked)
             # remove them from the list to clean up.
             acked[:len(batch) - 1] = []
             self._acked_index[tp].difference_update(batch)
